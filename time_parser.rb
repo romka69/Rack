@@ -11,12 +11,26 @@ class TimeParser
 
   attr_reader :in_format, :out_format
 
-  def initialize(params)
-    parse_format = params['format'].split(',')
+  def initialize(formats)
+    formats = formats.split(',')
+    partition_formats(formats)
+    join_valid_formats
+  end
 
-    in_format, @out_format = parse_format.partition { |param| FORMAT_TIME.key?(param) }
+  def partition_formats(formats)
+    @in_format, @out_format = formats.partition { |format| FORMAT_TIME.key?(format) }
+  end
 
-    @in_format = in_format.map { |handler| FORMAT_TIME[handler] }.join('-')
+  def join_valid_formats
+    @in_format = @in_format.map { |handler| FORMAT_TIME[handler] }.join('-')
+  end
+
+  def valid?
+    @out_format.empty?
+  end
+
+  def time_request
+    Time.now.strftime(@in_format)
   end
 
 end

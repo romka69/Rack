@@ -6,27 +6,23 @@ class App
   def call(env)
     @request = Rack::Request.new(env)
 
-    if @request.path_info == '/time'
-      return [400, header, ['No params']] unless @request.params['format']
+    return make_response(404, 'Not found, use /time') unless @request.path_info == '/time'
 
-      format = TimeParser.new(@request.params)
+    return make_response(400, 'No params') unless @request.params['format']
 
-      if format.out_format.empty?
-        [200, header, [Time.now.strftime(format.in_format)]]
-      else
-        [400, header, ["Unknown time format #{format.out_format}"]]
-      end
+    format = TimeParser.new(@request.params['format'])
 
+    if format.valid?
+      make_response(200, format.time_request)
     else
-      [404, header, ['Not found, use /time']]
+      make_response(400, "Unknown time format #{format.out_format}")
     end
-
   end
 
   private
 
-  def header
-    { 'Content-Type' => 'text/plain' }
+  def make_response(status, body)
+    [status, { 'Content-Type' => 'text/plain' }, [body]]
   end
 
 end
