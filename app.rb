@@ -15,7 +15,7 @@ class App
     if format.valid?
       make_response(200, format.time_request)
     else
-      make_response(400, "Unknown time format #{format.out_format}")
+      make_response(400, "Unknown time format #{format.unknown}")
     end
   end
 

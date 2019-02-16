@@ -9,28 +9,24 @@ class TimeParser
       'second' => '%S'
   }.freeze
 
-  attr_reader :in_format, :out_format
+  attr_reader :unknown
 
   def initialize(formats)
     formats = formats.split(',')
-    partition_formats(formats)
+    @known, @unknown = formats.partition { |format| FORMAT_TIME.key?(format) }
     join_valid_formats
   end
 
-  def partition_formats(formats)
-    @in_format, @out_format = formats.partition { |format| FORMAT_TIME.key?(format) }
-  end
-
   def join_valid_formats
-    @in_format = @in_format.map { |handler| FORMAT_TIME[handler] }.join('-')
+    @known_format = @known.map { |handler| FORMAT_TIME[handler] }.join('-')
   end
 
   def valid?
-    @out_format.empty?
+    @unknown.empty?
   end
 
   def time_request
-    Time.now.strftime(@in_format)
+    Time.now.strftime(@known_format)
   end
 
 end
